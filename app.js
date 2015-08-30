@@ -10,18 +10,22 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 //server.use(restify.CORS());
 
+process.env.RDS_HOSTNAME = process.env.RDS_HOSTNAME || "localhost";
+process.env.RDS_USERNAME = process.env.RDS_USERNAME || "root";
+process.env.RDS_PASSWORD = process.env.RDS_PASSWORD || "187000";
+process.env.RDS_PORT = process.env.RDS_PORT || 3306;
 var con = mysql.createConnection({
-    host: process.env.RDS_HOSTNAME || "localhost",
-    user: process.env.RDS_USERNAME || "root",
-    password: process.env.RDS_PASSWORD || "187000",
-    port: process.env.RDS_PORT || 3306,
+    host: process.env.RDS_HOSTNAME,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    port: process.env.RDS_PORT,
     database: "scratch"
 });
 //console.log(process.env.RDS_HOSTNAME || "localhost");
-console.log("scratch.cbwjb7fv2vay.us-west-2.rds.amazonaws.com");
-console.log(process.env.RDS_USERNAME || "root");
-console.log(process.env.RDS_PASSWORD || "187000");
-console.log(process.env.RDS_PORT || 3306);
+console.log(process.env.RDS_HOSTNAME);
+console.log(process.env.RDS_USERNAME);
+console.log(process.env.RDS_PASSWORD);
+console.log(process.env.RDS_PORT);
 
 var users, posts;
 
