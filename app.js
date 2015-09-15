@@ -27,7 +27,7 @@ console.log(process.env.RDS_USERNAME);
 console.log(process.env.RDS_PASSWORD);
 console.log(process.env.RDS_PORT);
 
-var users, posts;
+
 
 con.connect(function(err){
     if(err){
@@ -38,6 +38,9 @@ con.connect(function(err){
 
 });
 
+
+//Bootstrap database data.
+var users, posts, carousels;
 con.query('SELECT iduser, username, email, profile FROM users', function(err, rows) {
     users = rows;
 });
@@ -49,8 +52,37 @@ con.query('SELECT * FROM posts ORDER BY posts.update_time DESC', function(err, r
            self[index].comments = rows;
        });
     });
+});
+var sql = 'SELECT c.idcarousel, c.slug FROM carousels c ORDER BY c.idcarousel';
+    console.log(sql);
+con.query(sql, function(err, rows) {
+    carousels = rows;
+
+    carousels.forEach(function(elem, index, self) {
+        carousels[index].items = [];
+        con.query('SELECT ci.idcarousel_item, ci.resource, ci.url ' +
+        'FROM carousel_items ci ' +
+        'WHERE ci.carousels_idcarousel = ? ' +
+        'ORDER BY ci.idcarousel_item', [elem.idcarousel], function(err, rows2) {
+            //console.log(rows);
+            console.log('inside query');
+            console.log(rows2);
+            rows2.forEach(function(rows3){
+                carousels[index].items.push(rows3);
+            });
+            //carousels[index].items.push(rows2);
+            console.log(carousels[index]);
+
+            //console.log(self);
+        });
+
+        console.log('CAROUSEL DONE');
+        console.log(carousels);
+
+    });
 
 });
+
 
 //con.end(function(err) {
     // The connection is terminated gracefully
@@ -88,8 +120,28 @@ var findAllPosts = function(req, res, next){
     }
 };
 
+var findCarousel = function(req, res, next){
+    res.setHeader('Access-Control-Allow-Origin','*');
+
+    if(carousels.length) {
+        carousels.every(function(elem, index, self){
+           if(elem.slug == req.params.carouselSlug) {
+               res.send(200 , elem);
+               return false;
+           }else{
+               return true;
+           }
+        });
+
+        return next();
+    }else{
+        return next(err);
+    }
+};
+
 server.get({path : '/api/users' , version : '0.0.1'} , findAllUsers);
 server.get({path : '/api/posts' , version : '0.0.1'} , findAllPosts);
+server.get({path : '/api/carousels/:carouselSlug' , version : '0.0.1'} , findCarousel);
 
 //server.get({path : PATH +'/:jobId' , version : '0.0.1'} , findUser);
 //server.post({path : PATH , version: '0.0.1'} ,postNewUser);
