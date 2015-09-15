@@ -1,8 +1,9 @@
 var restify = require('restify');
 var mysql = require('mysql');
 
-var ip_addr = '127.0.0.1';
-var port = process.env.PORT || 3001;
+//var ip_addr = process.env.IP || '127.0.0.1';
+var ip_addr =  '10.134.40.148';
+var port = 8081;
 
 var server = restify.createServer({name:'scratch-api'});
 
@@ -34,7 +35,7 @@ con.connect(function(err){
         console.log('Error connecting to Db');
         return;
     }
-    console.log('Connection established');
+    console.log('Connection established at %s', ip_addr + ':' + port);
 
 });
 
